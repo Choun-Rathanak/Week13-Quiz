@@ -28,7 +28,6 @@ final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    
 
     return DefaultTabController(
       length: 2, 
@@ -41,7 +40,7 @@ final TextEditingController _searchController = TextEditingController();
           color: Theme.of(context).primaryColor,
           child: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.local_grocery_store), text: 'Groceries'),
+              Tab(icon: Icon(Icons.local_grocery_store), text: 'All Groceries'),
               Tab(icon: Icon(Icons.search), text: 'Search'),
             ],
           ),
@@ -58,10 +57,6 @@ final TextEditingController _searchController = TextEditingController();
        
   }
   Widget _buildAllGroceriesTab() {
-    if (dummyGroceryItems.isEmpty) {
-      return const Center(child: Text('No items added yet.'));
-    }
-
     return ListView.builder(
       itemCount: dummyGroceryItems.length,
       itemBuilder: (context, index) =>
