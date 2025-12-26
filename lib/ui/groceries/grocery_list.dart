@@ -11,7 +11,8 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
-
+final TextEditingController _searchController = TextEditingController();
+ var _searchQuery = '';
   void onCreate() async {
     // Navigate to the form screen using the Navigator push
     Grocery? newGrocery = await Navigator.push<Grocery>(
@@ -27,26 +28,85 @@ class _GroceryListState extends State<GroceryList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = const Center(child: Text('No items added yet.'));
+    
 
-    if (dummyGroceryItems.isNotEmpty) {
-      //  Display groceries with an Item builder and  LIst Tile
-      content = ListView.builder(
-        itemCount: dummyGroceryItems.length,
-        itemBuilder: (context, index) =>
-            GroceryTile(grocery: dummyGroceryItems[index]),
-      );
-    }
-
-    return Scaffold(
+    return DefaultTabController(
+      length: 2, 
+    child: Scaffold(
       appBar: AppBar(
         title: const Text('Your Groceries'),
         actions: [IconButton(onPressed: onCreate, icon: const Icon(Icons.add))],
       ),
-      body: content,
+       bottomNavigationBar: Container(
+          color: Theme.of(context).primaryColor,
+          child: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.local_grocery_store), text: 'Groceries'),
+              Tab(icon: Icon(Icons.search), text: 'Search'),
+            ],
+          ),
+        ),
+      body: TabBarView(
+        children: [
+          _buildAllGroceriesTab(),
+          _buildSearchTab(),
+        ],
+
+      ),
+      ),
+    );
+       
+  }
+  Widget _buildAllGroceriesTab() {
+    if (dummyGroceryItems.isEmpty) {
+      return const Center(child: Text('No items added yet.'));
+    }
+
+    return ListView.builder(
+      itemCount: dummyGroceryItems.length,
+      itemBuilder: (context, index) =>
+          GroceryTile(grocery: dummyGroceryItems[index]),
     );
   }
+
+  Widget _buildSearchTab(){
+     final filteredGroceries = dummyGroceryItems.where((grocery) {
+      return grocery.name.toLowerCase().startsWith(_searchQuery.toLowerCase());
+    }).toList();
+
+    return Column(
+      children: [
+        Padding(padding: const EdgeInsets.all(18),
+        child: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: "Search the groceries by name",
+            prefixIcon: const Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
+        ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: filteredGroceries.length,
+            itemBuilder: (context, index) => GroceryTile(grocery: filteredGroceries[index]),
+        ),
+        ),
+      ],
+    );
+    
+    
+  }
 }
+
+ 
 
 class GroceryTile extends StatelessWidget {
   const GroceryTile({super.key, required this.grocery});
